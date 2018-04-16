@@ -1,6 +1,6 @@
 {
   "HOST": "127.0.0.1",
-  "PORT": 8400,
+  "PORT": 9100,
   "MONGO_URL": "mongodb://localhost/schedule",
   "JWT_TOKEN": "343j45gin45g"
 }

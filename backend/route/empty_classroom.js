@@ -32,7 +32,7 @@ module.exports = {
     const availableAuditoriums = (await scheduleModel.aggregate([
       {$group: {_id: '$classroom', schedule: {$addToSet: {day: '$weekday', hour: '$time', weeks: '$weeks'}}}},
       {$match: {schedule: {$not: {$elemMatch: {day, hour, weeks: {$in: [week]}}}}}},
-      ...(allTags.length ? [{$match: {tags: {$all: allTags}}}] : []),
+      ...(allTags.length ? [{$match: {'_id.equipment': {$all: allTags}}}] : []),
       {$project: {_id: 1}}
     ])).map(({_id}) => _id);
     return await availableAuditoriums;
