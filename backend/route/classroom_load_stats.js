@@ -12,7 +12,7 @@ const {formatArray} = require('./../util/range_formatter');
 
 module.exports = {
   method: 'GET',
-  path: '/reports/classroomsLoad',
+  path: '/reports/classrooms/load',
   options: {
     auth: {
       scope: ['admin'],
@@ -23,7 +23,9 @@ module.exports = {
         allowUnknown: true
       },
       query: {
-        restrooms: Joi.string().default('').optional()
+        restrooms: Joi.string().default('').optional(),
+        teachers: Joi.string().default('').optional(),
+        subjects: Joi.string().default('').optional()
       }
     }
   },
@@ -35,18 +37,26 @@ module.exports = {
       const [building, number] = auditorium.split('-');
       return {building, number};
     });
+    const teachers = request.query.teachers.split(',').filter(Boolean);
+    const subjects = request.query.subjects.split(',').filter(Boolean);
 
     const classrooms = (await scheduleModel.aggregate([
       ... (queryClassrooms.length) ? [{$match: {classroom: {$in: queryClassrooms}}}] : [],
+      ... (teachers.length) ? [{$match: {teacher: {$in: teachers}}}] : [],
+      ... (subjects.length) ? [{$match: {subject: {$in: subjects}}}] : [],
       {$group: {_id: '$classroom'}}])).map(({_id}) => _id).filter(el => _.isObject(el));
 
     const days = (await scheduleModel.aggregate([{$group: {_id: '$weekday'}}])).map(({_id}) => _id).filter(el => _.isNumber(el)).sort((a, b) => a > b);
     const hours = (await scheduleModel.aggregate([{$group: {_id: '$time'}}])).map(({_id}) => _id).filter(el => _.isNumber(el)).sort((a, b) => a > b);
-    const schedule = (await scheduleModel.find(queryClassrooms.length ? {classroom: {$in: queryClassrooms}} : {}));
+    const schedule = (await scheduleModel.aggregate([
+      ... (queryClassrooms.length ? [{$match: {classroom: {$in: queryClassrooms}}}] : []),
+      ... (teachers.length) ? [{$match: {teacher: {$in: teachers}}}] : [],
+      ... (subjects.length) ? [{$match: {subject: {$in: subjects}}}] : []
+    ]));
 
     function getScheduleInfo(schedule, auditorium, hour, day) {
       return schedule
-        .filter(({classroom, time, weekday}) => time === hour && day === weekday && _.isEqual(classroom, auditorium))[0];
+        .filter(({classroom, time, weekday}) => time === hour && day === weekday && _.isEqual(classroom, auditorium));
     }
 
     function getFormattedTeacher(teacherName) {
@@ -74,9 +84,14 @@ module.exports = {
       _.each(classrooms, (classroom) => {
         const scheduleRow = [hoursMap[hour], classroom.building + '-' + classroom.number];
         _.each(days, (day) => {
-          const {weeks, teacher} = getScheduleInfo(schedule, classroom, hour, day) || {};
-          scheduleRow.push(getFormattedTeacher(teacher));
-          scheduleRow.push(formatArray(weeks));
+          const scheduleInfo = getScheduleInfo(schedule, classroom, hour, day);
+          const teacher = scheduleInfo
+            .map(({teacher, subject}) => getFormattedTeacher(teacher) + (subjects.length ? `: ${subject}` : ''))
+            .join(';\n');
+          const weeks = scheduleInfo.map(({weeks}) => formatArray(weeks)).join(';\n');
+
+          scheduleRow.push(teacher);
+          scheduleRow.push(weeks);
         });
         scheduleData.push(scheduleRow);
       });
@@ -86,9 +101,9 @@ module.exports = {
     });
 
     const option = {'!merges': ranges, cellStyles: {alignment: {wrapText: true}}};
-    const buffer = xlsx.build([{name: 'mySheetName.xlsx', data: scheduleData}], option); // Returns a buffer
+    const buffer = xlsx.build([{name: 'schedule.xlsx', data: scheduleData}], option);
     return h.response(buffer)
       .type('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-      .header('Content-disposition', 'attachment; filename=' + 'mySheetName.xlsx');
+      .header('Content-disposition', 'attachment; filename=' + 'schedule.xlsx');
   }
 };
