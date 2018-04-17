@@ -1,4 +1,4 @@
-from flask import Flask, Response, request
+from flask import Flask, request, jsonify
 from . import parser, repo
 
 app = Flask(__name__)
@@ -10,8 +10,8 @@ def parse_schedule():
     if schedule_file:
         schedule = parser.parse_schedule(schedule_file)
         result = repo.save_schedule(schedule)
-        return Response("inserted {} schedule documents (modified {})"
-                        .format(result.upserted_count, result.modified_count))
+        return jsonify({k: v for k, v in result.bulk_api_result.items()
+                        if k in ('nUpserted', 'nModified')})
 
 
 @app.route('/parse/classrooms', methods=['POST'])
@@ -20,5 +20,4 @@ def parse_classrooms():
     if classrooms_file:
         classrooms = parser.parse_classrooms(classrooms_file)
         result = repo.save_classrooms(classrooms)
-        return Response("updated {} schedule documents with {} classroom documents"
-                        .format(result.modified_count, len(classrooms)))
+        return jsonify({'nModified': result.modified_count})
