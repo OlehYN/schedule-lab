@@ -3,7 +3,6 @@
 const Hapi = require('hapi');
 
 const good = require('good');
-const mongodb = require('mongodb');
 const mongoose = require('mongoose');
 const yar = require('yar');
 
@@ -29,7 +28,6 @@ async function start() {
   try {
     await mongoose.connect(MONGO_URL);
     await model(mongoose);
-    mongodb.con
 
     await server.register({plugin: good, options: goodConfig});
     await server.register({plugin: yar, options: yarConfig});
@@ -44,13 +42,12 @@ async function start() {
     await server.route(route);
 
     await server.start();
-  }
-  catch (err) {
-    console.log(err);
-    process.exit(1);
+  } catch (err) {
+    server.log(['error'], err);
+    throw err;
   }
 
-  console.log('Server running at:', server.info.uri);
+  server.log(['init'], `Server running at: ${server.info.uri}`);
 }
 
 (async function () {

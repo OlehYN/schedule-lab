@@ -3,6 +3,8 @@
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 
+const {JWT_TOKEN} = require('./../config');
+
 module.exports = {
   method: 'POST',
   path: '/login',
@@ -17,7 +19,7 @@ module.exports = {
   },
   handler: (request) => {
     request.yar.set('example', {key: 'value'});
-    const token = jwt.sign({id: 1, scope: ['admin']}, process.env.JWT_TOKEN);
+    const token = jwt.sign({id: 1, scope: ['admin']}, JWT_TOKEN);
     return {token};
   }
 };
