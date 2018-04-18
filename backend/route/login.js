@@ -9,6 +9,7 @@ module.exports = {
   method: 'POST',
   path: '/login',
   options: {
+    tags: ['api'],
     auth: false,
     validate: {
       payload: {

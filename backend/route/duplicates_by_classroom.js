@@ -4,6 +4,7 @@ module.exports = {
   method: 'GET',
   path: '/reports/duplicates/classroom',
   options: {
+    tags: ['api'],
     auth: {
       scope: ['admin'],
       strategy: 'jwt'

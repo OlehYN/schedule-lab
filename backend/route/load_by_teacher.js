@@ -9,6 +9,7 @@ module.exports = {
   method: 'GET',
   path: '/teacher/load',
   options: {
+    tags: ['api'],
     auth: {
       scope: ['admin'],
       strategy: 'jwt'

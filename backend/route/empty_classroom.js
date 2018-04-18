@@ -6,6 +6,7 @@ module.exports = {
   method: 'GET',
   path: '/classroom/empty',
   options: {
+    tags: ['api'],
     auth: {
       scope: ['admin'],
       strategy: 'jwt'

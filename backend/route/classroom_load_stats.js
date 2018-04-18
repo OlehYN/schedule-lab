@@ -14,6 +14,7 @@ module.exports = {
   method: 'GET',
   path: '/reports/classrooms/load',
   options: {
+    tags: ['api'],
     auth: {
       scope: ['admin'],
       strategy: 'jwt'
