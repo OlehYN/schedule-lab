@@ -24,7 +24,7 @@ module.exports = {
         allowUnknown: true
       },
       query: {
-        restrooms: Joi.string().default('').optional(),
+        classrooms: Joi.string().default('').optional(),
         teachers: Joi.string().default('').optional(),
         subjects: Joi.string().default('').optional()
       }
@@ -34,7 +34,7 @@ module.exports = {
     const {server: {app: {db}}} = request;
     const scheduleModel = db.model('schedule');
 
-    const queryClassrooms = request.query.restrooms.split(',').filter(Boolean).map((auditorium) => {
+    const queryClassrooms = request.query.classrooms.split(',').filter(Boolean).map((auditorium) => {
       const [building, number] = auditorium.split('-');
       return {building, number};
     });
