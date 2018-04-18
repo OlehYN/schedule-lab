@@ -16,7 +16,7 @@ module.exports = {
         allowUnknown: true
       },
       query: {
-        name: Joi.string().required()
+        name: Joi.string().required().description('Teacher name')
       }
     }
   },
