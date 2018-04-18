@@ -49,11 +49,13 @@ module.exports = {
 
     const days = (await scheduleModel.aggregate([{$group: {_id: '$weekday'}}])).map(({_id}) => _id).filter(el => _.isNumber(el)).sort((a, b) => a > b);
     const hours = (await scheduleModel.aggregate([{$group: {_id: '$time'}}])).map(({_id}) => _id).filter(el => _.isNumber(el)).sort((a, b) => a > b);
-    const schedule = (await scheduleModel.aggregate([
+
+    const aggregate = [
       ... (queryClassrooms.length ? [{$match: {classroom: {$in: queryClassrooms}}}] : []),
       ... (teachers.length) ? [{$match: {teacher: {$in: teachers}}}] : [],
       ... (subjects.length) ? [{$match: {subject: {$in: subjects}}}] : []
-    ]));
+    ];
+    const schedule = aggregate.length ? (await scheduleModel.aggregate(aggregate)) : (await scheduleModel.find({}));
 
     function getScheduleInfo(schedule, auditorium, hour, day) {
       return schedule
