@@ -78,6 +78,10 @@ async function start() {
   server.log(['init'], `Server running at: ${server.info.uri}`);
 }
 
+process.on('SIGTERM', () => {
+  server.close(() => process.exit(0));
+});
+
 (async function () {
   await start();
 })();
