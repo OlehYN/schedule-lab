@@ -1,0 +1,44 @@
+#root, .layout {
+  height: 100%
+}
+
+.ant-layout-has-sider > div.sider {
+    width: 256px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+}
+
+.header__title {
+    margin-left: 10px;
+    color: #ECECEC;
+}
+
+.content {
+    padding: 15px 75px;
+}
+
+.content__title {
+    color: #1DA57A;
+    font-size: 24px;
+}
+
+.content__select__label {
+    margin: 10px 0;
+}
+
+.content__select__input {
+    margin: 24px 0;
+}
+
+.content__table {
+    margin: 24px 0;
+}
+
+
+.footer {
+    background: #404040;
+    color: #ECECEC;
+}
