@@ -42,3 +42,12 @@
     background: #404040;
     color: #ECECEC;
 }
+
+
+/* remove me after tests */
+.redux {
+    background: #EDF8F5;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}

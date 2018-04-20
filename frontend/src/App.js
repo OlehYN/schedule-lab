@@ -4,19 +4,11 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
 // antd
-import { Layout } from "antd";
-import { Menu } from "antd";
-import { Avatar } from "antd";
-import { Select } from "antd";
-import { Table } from "antd";
+import { Layout, Menu, Avatar, Select, Table, Button } from "antd";
 
 // redux
 import { increment, decrement } from "./redux/actions/counter";
-// import {
-//     selectSubreddit,
-//     fetchPostsIfNeeded,
-//     invalidateSubreddit
-// } from ".redux/actions/reddit";
+import { fetchPostsWithRedux } from "./redux/actions/example";
 
 // styles
 import "./App.css";
@@ -27,6 +19,18 @@ const MenuItemGroup = Menu.ItemGroup;
 const Option = Select.Option;
 
 class App extends Component {
+    // добавлять дефолтный стейт в конструкторе
+    // также можно байндить методы явно, чтобы не юзать в рендере {() =>}
+    constructor(props) {
+        super(props);
+
+        this._handleApiCall = this._handleApiCall.bind(this);
+    }
+
+    _handleApiCall() {
+        console.log("🦄 API 💩", this.props.fetchPostsWithRedux());
+    }
+
     render() {
         // колоноки Table
         const columns = [
@@ -93,17 +97,23 @@ class App extends Component {
                     </Sider>
                     <Content className="content">
                         <div className="content__title">Option Title</div>
-                        <div>
-                            <span>redux example</span>
+                        <div className="redux">
+                            <h3>Redux example</h3>
                             <div>
                                 <button onClick={this.props.increment}>
                                     Increment
                                 </button>
                                 <button onClick={this.props.decrement}>
-                                    decrement
+                                    Decrement
                                 </button>
                             </div>
                             <p>Count: {this.props.count}</p>
+                            <Button
+                                type="primary"
+                                onClick={this._handleApiCall}
+                            >
+                                API call
+                            </Button>
                         </div>
                         <div className="content__select">
                             <div className="content__select__label">Label</div>
@@ -152,17 +162,21 @@ class App extends Component {
     }
 }
 
+// Вытягиваем кусок состояния redux в props нашего компонета
 const mapStateToProps = state => ({
     count: state.counter.count
 });
 
+// Передаем экшены, чтобы они были доступны без доп. оберток и связаны со store
 const mapDispatchToProps = dispatch =>
     bindActionCreators(
         {
             increment,
-            decrement
+            decrement,
+            fetchPostsWithRedux
         },
         dispatch
     );
 
+// connect им компонент к redux
 export default connect(mapStateToProps, mapDispatchToProps)(App);
