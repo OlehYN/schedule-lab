@@ -43,7 +43,7 @@ async function start() {
       validate,
       verifyOptions: {algorithms: ['HS256']}
     });
-    await server.auth.default('jwt');
+    //await server.auth.default('jwt');
     await server.route(route);
 
     const swaggerOptions = {

@@ -1,6 +1,6 @@
 import types from "../types";
 
-const initialState = { count: 0 };
+const initialState = {count: 0};
 
 export default (state = initialState, action) => {
     switch (action.type) {

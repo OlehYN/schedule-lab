@@ -7,10 +7,6 @@ module.exports = {
   path: '/classrooms',
   options: {
     tags: ['api'],
-    auth: {
-      scope: ['admin'],
-      strategy: 'jwt'
-    },
     validate: {
       options: {
         allowUnknown: true
@@ -30,7 +26,8 @@ module.exports = {
     return (await scheduleModel.aggregate([
       {$group: {_id: '$classroom'}},
       ...(allTags.length ? [{$match: {'_id.equipment': {$all: allTags}}}] : []),
-      {$project: {_id: 1}}
-    ])).map(({_id}) => _id);
+      {$project: {_id: 1}},
+      {$sort: {_id: 1}}
+    ])).map(({_id}) => _id).filter(Boolean);
   }
 };

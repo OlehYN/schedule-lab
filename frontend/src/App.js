@@ -1,20 +1,29 @@
 // vendors
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import _ from 'lodash';
+import React, {Component} from "react";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 
 // antd
-import { Layout, Menu, Avatar, Select, Table, Button } from "antd";
+import {Layout, Menu, Avatar, Select, Table, Button} from "antd";
 
 // redux
-import { increment, decrement } from "./redux/actions/counter";
-import { fetchPostsWithRedux } from "./redux/actions/example";
+import {increment, decrement} from "./redux/actions/counter";
+import {fetchClassrooms} from "./redux/actions/classrooms";
+import {fetchTeachers, fetchTeachersLoad} from "./redux/actions/teachers";
+import {fetchSubjects} from './redux/actions/subjects';
+
+import days from './constants/days';
+import hours from './constants/hours';
+import weeks from './constants/weeks';
+
+import teacherLoadConfig from './configs/teachers_load';
 
 // styles
 import "./App.css";
 
 // antd
-const { Header, Footer, Sider, Content } = Layout;
+const {Header, Footer, Sider, Content} = Layout;
 const MenuItemGroup = Menu.ItemGroup;
 const Option = Select.Option;
 
@@ -23,72 +32,65 @@ class App extends Component {
     // также можно байндить методы явно, чтобы не юзать в рендере {() =>}
     constructor(props) {
         super(props);
+        this.state = {
+            selectedClassrooms: [],
+            selectedTeachers: [],
+            selectedSubjects: [],
+            selectedDays: [],
+            selectedHours: [],
+            selectedWeeks: []
+        };
 
-        this._handleApiCall = this._handleApiCall.bind(this);
+        this.props.fetchClassrooms();
+        this.props.fetchTeachers();
+        this.props.fetchSubjects();
     }
 
-    _handleApiCall() {
-        console.log("🦄 API 💩", this.props.fetchPostsWithRedux());
+    componentWillReceiveProps(nextProps) {
+        // TODO do smth shitty
+    }
+
+    onSelectChange = (name, value) => {
+        this.setState({[name]: value});
+    };
+
+    _sendRequest() {
+        this.props.fetchTeachersLoad(this.state.selectedTeachers, this.state.selectedWeeks);
     }
 
     render() {
-        // колоноки Table
-        const columns = [
-            {
-                title: "Name",
-                dataIndex: "name",
-                key: "name"
-            },
-            {
-                title: "Age",
-                dataIndex: "age",
-                key: "age"
-            },
-            {
-                title: "Address",
-                dataIndex: "address",
-                key: "address"
-            }
-        ];
+        const {payloadTransform, columns} = teacherLoadConfig;
 
-        // мок данных для таблиц
-        const data = [];
-        for (let i = 0; i < 46; i++) {
-            data.push({
-                key: i,
-                name: `Edward King ${i}`,
-                age: 32,
-                address: `London, Park Lane no. ${i}`
-            });
-        }
+        const classrooms = this.props.classrooms
+            .map(({building, number}) => <Option key={`${building}-${number}`}>{building}-{number}</Option>);
 
-        const children = [];
-        for (let i = 10; i < 36; i++) {
-            children.push(
-                <Option key={i.toString(36) + i}>{i.toString(36) + i}</Option>
-            );
-        }
+        const teachers = this.props.teachers
+            .map((name) => <Option key={name}>{name}</Option>);
 
-        function handleChange(value) {
-            console.log(`selected ${value}`);
-        }
+        const subjects = this.props.subjects
+            .map((name) => <Option key={name}>{name}</Option>);
+
+        const daysOptions = _.entries(days).map(([key, value]) => <Option key={key}>{value}</Option>);
+        const hoursOptions = _.entries(hours).map(([key, value]) => <Option key={key}>{value}</Option>);
+        const weeksOptions = weeks.map((value) => <Option key={value}>{value}</Option>);
+
         return (
             <Layout className="layout">
                 <Header className="header">
-                    <Avatar size="large" icon="calendar" />
+                    <Avatar size="large" icon="calendar"/>
                     <div className="header__title">EPIC SCHEDULER</div>
                 </Header>
                 <Layout>
-                    <Sider className="sider" width={{ widht: 256 }}>
+                    <Sider className="sider" width={{widht: 256}}>
                         <Menu
                             onClick={this.handleClick}
-                            style={{ width: 256 }}
+                            style={{width: 256}}
                             defaultSelectedKeys={["1"]}
                             defaultOpenKeys={["sub1"]}
                             mode="inline"
                         >
-                            <MenuItemGroup key="g1" title="Navigation">
-                                <Menu.Item key="1">Option 1</Menu.Item>
+                            <MenuItemGroup key="g1" title="Меню">
+                                <Menu.Item key="1">Навантаження викладача</Menu.Item>
                                 <Menu.Item key="2">Option 2</Menu.Item>
                                 <Menu.Item key="3">Option 3</Menu.Item>
                                 <Menu.Item key="4">Option 4</Menu.Item>
@@ -96,62 +98,76 @@ class App extends Component {
                         </Menu>
                     </Sider>
                     <Content className="content">
-                        <div className="content__title">Option Title</div>
-                        <div className="redux">
-                            <h3>Redux example</h3>
-                            <div>
-                                <button onClick={this.props.increment}>
-                                    Increment
-                                </button>
-                                <button onClick={this.props.decrement}>
-                                    Decrement
-                                </button>
-                            </div>
-                            <p>Count: {this.props.count}</p>
-                            <Button
-                                type="primary"
-                                onClick={this._handleApiCall}
-                            >
-                                API call
-                            </Button>
-                        </div>
                         <div className="content__select">
-                            <div className="content__select__label">Label</div>
                             <Select
                                 mode="multiple"
-                                style={{ width: "100%" }}
-                                placeholder="Please select"
-                                defaultValue={["a10", "c12"]}
-                                onChange={handleChange}
+                                style={{width: "100%", paddingTop: '10px'}}
+                                placeholder="Виберіть аудиторію"
+                                defaultValue={this.state.selectedClassrooms}
+                                onChange={this.onSelectChange.bind(this, 'selectedClassrooms')}
                             >
-                                {children}
+                                {classrooms}
                             </Select>
-                            <div className="content__select__label">
-                                Label 2
+                            <Select
+                                mode="multiple"
+                                style={{width: "49.5%", paddingTop: '10px', marginRight: '0.5%'}}
+                                placeholder="Виберіть предмет"
+                                defaultValue={this.state.selectedSubjects}
+                                onChange={this.onSelectChange.bind(this, 'selectedSubjects')}
+                            >
+                                {subjects}
+                            </Select>
+                            <Select
+                                mode="multiple"
+                                style={{width: "49.5%", paddingTop: '10px', marginLeft: '0.5%'}}
+                                placeholder="Виберіть викладача"
+                                defaultValue={this.state.selectedTeachers}
+                                onChange={this.onSelectChange.bind(this, 'selectedTeachers')}
+                            >
+                                {teachers}
+                            </Select>
+                            <Select
+                                mode="multiple"
+                                style={{width: "33%", paddingTop: '10px'}}
+                                placeholder="Виберіть день"
+                                defaultValue={this.state.selectedDays}
+                                onChange={this.onSelectChange.bind(this, 'selectedDays')}
+                            >
+                                {daysOptions}
+                            </Select>
+                            <Select
+                                mode="multiple"
+                                style={{width: "33%", 'marginLeft': "0.5%", 'marginRight': "0.5%", paddingTop: '10px'}}
+                                placeholder="Виберіть годину"
+                                defaultValue={this.state.selectedHours}
+                                onChange={this.onSelectChange.bind(this, 'selectedHours')}
+                            >
+                                {hoursOptions}
+                            </Select>
+                            <Select
+                                mode="multiple"
+                                style={{width: "33%", paddingTop: '10px'}}
+                                placeholder="Виберіть тиждень"
+                                defaultValue={this.state.selectedWeeks}
+                                onChange={this.onSelectChange.bind(this, 'selectedWeeks')}
+                            >
+                                {weeksOptions}
+                            </Select>
+
+                            <div style={{margin: '0 auto', textAlign: 'center', paddingTop: '10px'}}>
+                                <Button
+                                    type="primary"
+                                    onClick={this._sendRequest.bind(this)}
+                                >
+                                    Запустити
+                                </Button>
                             </div>
-                            <Select
-                                mode="multiple"
-                                style={{ width: "100%" }}
-                                placeholder="Please select"
-                                onChange={handleChange}
-                            >
-                                {children}
-                            </Select>
-                            <div className="content__select__label">
-                                Label 3
-                            </div>
-                            <Select
-                                mode="multiple"
-                                style={{ width: "100%" }}
-                                placeholder="Please select"
-                                onChange={handleChange}
-                            >
-                                {children}
-                            </Select>
+
                             <Table
                                 className="content__table"
                                 columns={columns}
-                                dataSource={data}
+                                pagination={{pageSize: 10}}
+                                dataSource={this.props.query.data ? payloadTransform(this.props.query.data) : []}
                             />
                         </div>
                     </Content>
@@ -164,7 +180,11 @@ class App extends Component {
 
 // Вытягиваем кусок состояния redux в props нашего компонета
 const mapStateToProps = state => ({
-    count: state.counter.count
+    count: state.counter.count,
+    classrooms: state.classroom.classrooms,
+    teachers: state.teacher.teachers,
+    subjects: state.subject.subjects,
+    query: state.teacher.query
 });
 
 // Передаем экшены, чтобы они были доступны без доп. оберток и связаны со store
@@ -173,10 +193,23 @@ const mapDispatchToProps = dispatch =>
         {
             increment,
             decrement,
-            fetchPostsWithRedux
+            fetchClassrooms,
+            fetchTeachers,
+            fetchSubjects,
+            fetchTeachersLoad
         },
         dispatch
     );
 
 // connect им компонент к redux
 export default connect(mapStateToProps, mapDispatchToProps)(App);
+
+App.defaultProps = {
+    classrooms: [],
+    teachers: [],
+    subjects: [],
+    query: {
+        type: '',
+        data: []
+    }
+};

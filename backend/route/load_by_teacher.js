@@ -10,17 +10,10 @@ module.exports = {
   path: '/teacher/load',
   options: {
     tags: ['api'],
-    auth: {
-      scope: ['admin'],
-      strategy: 'jwt'
-    },
     validate: {
-      options: {
-        allowUnknown: true
-      },
       query: {
         name: Joi.string().empty('').optional(),
-        week: Joi.number().optional()
+        week: Joi.number().empty('').optional()
       }
     }
   },
@@ -31,8 +24,9 @@ module.exports = {
 
     const scheduleModel = db.model('schedule');
 
+    const teachers = name ? name.split(',') : [];
     const availableAuditoriums = (await scheduleModel.aggregate([
-      ...(name ? [{$match: {teacher: {$regex: `.*${name}.*`}}}] : []),
+      ...(name ? [{$match: {teacher: {$in: teachers}}}] : []),
       ...(week ? [{$match: {weeks: {$in: [week]}}}] : []),
       {
         $group: {
@@ -51,11 +45,15 @@ module.exports = {
       }
     ])).map(({_id, schedule}) => ({teacher: _id, schedule}));
 
+    function sortSchedule({hour: hourA}, {hour: hourB}) {
+      return hourA > hourB;
+    }
+
     const dayIds = _.keys(days);
     const teachersSchedule = await availableAuditoriums;
     return teachersSchedule.map(({teacher, schedule}) => ({
       teacher,
-      schedule: dayIds.map((id) => ({day: id, subjects: schedule.filter(({day}) => Number(day) === Number(id))}))
+      schedule: dayIds.map((id) => ({day: id, subjects: schedule.filter(({day}) => Number(day) === Number(id)).sort(sortSchedule)}))
     }));
   }
 };

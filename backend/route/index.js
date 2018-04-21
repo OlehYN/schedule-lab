@@ -12,5 +12,6 @@ module.exports = [
   require('./teachers'),
   require('./nearest_subject'),
   require('./teacher_groups'),
-  require('./find_subject')
+  require('./find_subject'),
+  require('./subjects')
 ];

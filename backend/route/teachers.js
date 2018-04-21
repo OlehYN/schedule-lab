@@ -7,10 +7,6 @@ module.exports = {
   path: '/teachers',
   options: {
     tags: ['api'],
-    auth: {
-      scope: ['admin'],
-      strategy: 'jwt'
-    },
     validate: {
       options: {
         allowUnknown: true
@@ -35,7 +31,8 @@ module.exports = {
       ...(subject ? [{$match: {_id: {$in: subjects}}}] : []),
       {$project: {_id: 0, teachers: 1}},
       {$unwind: '$teachers'},
-      {$group: {_id: '$teachers'}}
+      {$group: {_id: '$teachers'}},
+      {$sort: {_id: 1}}
     ])).map(({_id}) => _id);
   }
 };
