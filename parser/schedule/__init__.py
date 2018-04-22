@@ -1,1 +1,1 @@
-from schedule.server import app as server
+from .server import app as server

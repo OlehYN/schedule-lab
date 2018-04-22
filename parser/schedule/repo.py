@@ -1,4 +1,4 @@
-from pymongo import MongoClient, ReplaceOne, UpdateMany
+from pymongo import MongoClient, InsertOne, UpdateMany, DeleteMany, ReturnDocument
 import configparser
 
 config = configparser.ConfigParser()
@@ -7,25 +7,33 @@ conf = config['mongodb']
 
 client = MongoClient(conf['host'], conf.getint('port'))
 db = client[conf['db']]
+schedule_coll = db['schedule']
+specialties_coll = db['specialties']
 
 
-def save_schedule(schedule):
+def save_schedule(specialty, schedules):
     requests = []
-    for s in schedule:
-        filter = {k: s[k] for k in ('weekday', 'time')}
-        filter.update({'weeks': {"$in": s['weeks']}})
-        filter.update({'classroom.' + k: s['classroom'][k] for k in ('building', 'number')})
+    specialty = specialties_coll.find_one_and_update(
+        specialty,
+        {'$set': specialty},
+        upsert=True,
+        return_document=ReturnDocument.AFTER)
+    requests.append(DeleteMany({'specialty': specialty['_id']}))
+    for s in schedules:
+        doc = s.copy()
+        doc['specialty'] = specialty['_id']
+        requests.append(InsertOne(doc))
+    return schedule_coll.bulk_write(requests)
 
-        requests.append(ReplaceOne(filter, s, upsert=True))
-    result = db['schedule'].bulk_write(requests)
-    return result
+
+def remove_schedules_for(specialty):
+    return schedule_coll.delete_many({'specialty': specialty['_id']})
 
 
-def save_classrooms(classrooms):
+def update_classrooms(classrooms):
     requests = []
     for c in classrooms:
         filter = {'classroom.' + k: c[k] for k in ('building', 'number')}
         update = {'$set': {'classroom.' + k: v for k, v in c.items()}}
         requests.append(UpdateMany(filter, update))
-    result = db['schedule'].bulk_write(requests)
-    return result
+    return schedule_coll.bulk_write(requests)

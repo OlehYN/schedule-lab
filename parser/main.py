@@ -1,5 +1,5 @@
 import configparser
-from schedule.server import app
+from schedule import server
 
 
 def main():
@@ -7,7 +7,7 @@ def main():
     config.read('config.ini')
     conf = config['api']
 
-    app.run(conf['host'], conf.getint('port'), debug=conf.getboolean('debug'))
+    server.run(conf['host'], conf.getint('port'), debug=conf.getboolean('debug'))
 
 
 if __name__ == "__main__":

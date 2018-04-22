@@ -3,14 +3,18 @@ import collections
 
 
 def parse_rows(io, header=0):
-    df = parse_df(io, header)
+    df = parse_io(io, header)
     return [row.to_dict for _, row in df.iterrows()]
 
 
-def parse_df(io, header=0):
-    df = pd.read_excel(io, header=None)
-    df = with_header(df, header)
-    return df
+def parse_io(io, header=0):
+    xls = pd.ExcelFile(io)
+    return parse_xls(xls, header)
+
+
+def parse_xls(xls, header=0):
+    df = xls.parse(header=None)
+    return with_header(df, header)
 
 
 def with_header(df, header=0):
@@ -34,5 +38,17 @@ def with_header(df, header=0):
             header_n = header
         df.columns = df.iloc[header_n]
     df = df[header_n + 1:]
-    df.dropna(how='all', inplace=True)
+    df = df.dropna(how='all')
     return df
+
+
+def find_row_by_prefix(df, prefix):
+    for irow in df.iterrows():
+        val = str(irow[1].values[0])
+        if val.startswith(prefix):
+            return irow[0]
+
+
+def fetch_fst_val(df, row):
+    return df.loc[row][0]
+
