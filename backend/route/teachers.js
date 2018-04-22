@@ -8,9 +8,6 @@ module.exports = {
   options: {
     tags: ['api'],
     validate: {
-      options: {
-        allowUnknown: true
-      },
       query: {
         teacher: Joi.string().empty('').optional(),
         subject: Joi.string().empty('').optional()

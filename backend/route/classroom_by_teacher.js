@@ -7,14 +7,7 @@ module.exports = {
   path: '/classroom/teacher',
   options: {
     tags: ['api'],
-    auth: {
-      scope: ['admin'],
-      strategy: 'jwt'
-    },
     validate: {
-      options: {
-        allowUnknown: true
-      },
       query: {
         name: Joi.string().required().description('Teacher name')
       }

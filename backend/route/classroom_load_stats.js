@@ -15,14 +15,7 @@ module.exports = {
   path: '/reports/classrooms/load',
   options: {
     tags: ['api'],
-    auth: {
-      scope: ['admin'],
-      strategy: 'jwt'
-    },
     validate: {
-      options: {
-        allowUnknown: true
-      },
       query: {
         classrooms: Joi.string().default('').optional(),
         teachers: Joi.string().default('').optional(),

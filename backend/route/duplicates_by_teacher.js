@@ -4,11 +4,7 @@ module.exports = {
   method: 'GET',
   path: '/reports/duplicates/teacher',
   options: {
-    tags: ['api'],
-    auth: {
-      scope: ['admin'],
-      strategy: 'jwt'
-    }
+    tags: ['api']
   },
   handler: async (request) => {
     const {server: {app: {db}}} = request;

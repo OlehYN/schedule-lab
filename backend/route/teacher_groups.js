@@ -7,14 +7,7 @@ module.exports = {
   path: '/teacher/groups',
   options: {
     tags: ['api'],
-    auth: {
-      scope: ['admin'],
-      strategy: 'jwt'
-    },
     validate: {
-      options: {
-        allowUnknown: true
-      },
       query: {
         teacher: Joi.string().required()
       }
