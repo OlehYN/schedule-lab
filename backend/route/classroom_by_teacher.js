@@ -26,11 +26,9 @@ module.exports = {
 
     const scheduleModel = db.model('schedule');
 
-    const availableAuditoriums = (await scheduleModel.aggregate([
+    return (await scheduleModel.aggregate([
       {$match: {teacher : {$regex : `.*${name}.*`}}},
       {$group: {_id: '$classroom', schedule: {$addToSet: {day: '$weekday', hour: '$time', weeks: '$weeks'}}}}
     ])).map(({_id, schedule}) => ({room: _id, schedule}));
-
-    return await availableAuditoriums;
   }
 };

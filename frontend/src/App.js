@@ -10,14 +10,14 @@ import {Layout, Menu, Avatar, Select, Table, Button} from "antd";
 // redux
 import {increment, decrement} from "./redux/actions/counter";
 import {fetchClassrooms} from "./redux/actions/classrooms";
-import {fetchTeachers, fetchTeachersLoad} from "./redux/actions/teachers";
+import {fetchTeachers, fetchTeachersLoad, fetchFilterTeachersLoad} from "./redux/actions/teachers";
 import {fetchSubjects} from './redux/actions/subjects';
 
 import days from './constants/days';
 import hours from './constants/hours';
 import weeks from './constants/weeks';
 
-import teacherLoadConfig from './configs/teachers_load';
+import queriesConfig from './configs';
 
 // styles
 import "./App.css";
@@ -37,8 +37,17 @@ class App extends Component {
             selectedTeachers: [],
             selectedSubjects: [],
             selectedDays: [],
+            selectedWeeks: [],
             selectedHours: [],
-            selectedWeeks: []
+
+            key: 'teachersLoad',
+
+            ...(Object.assign({},
+                    ..._.toPairs(queriesConfig)
+                        .filter(([fieldName]) => fieldName === 'storageField')
+                        .map(([name, storageField]) => ({[storageField]: []}))
+                )
+            )
         };
 
         this.props.fetchClassrooms();
@@ -55,11 +64,15 @@ class App extends Component {
     };
 
     _sendRequest() {
-        this.props.fetchTeachersLoad(this.state.selectedTeachers, this.state.selectedWeeks);
+        queriesConfig[this.state.key].sendRequest(this.props, this.state);
+    }
+
+    menuItemChange({key}) {
+        this.setState({key, query: {type: null, data: []}});
     }
 
     render() {
-        const {payloadTransform, columns} = teacherLoadConfig;
+        const {payloadTransform, columns} = queriesConfig[this.state.key];
 
         const classrooms = this.props.classrooms
             .map(({building, number}) => <Option key={`${building}-${number}`}>{building}-{number}</Option>);
@@ -83,17 +96,15 @@ class App extends Component {
                 <Layout>
                     <Sider className="sider" width={{widht: 256}}>
                         <Menu
-                            onClick={this.handleClick}
+                            onClick={this.menuItemChange.bind(this)}
                             style={{width: 256}}
                             defaultSelectedKeys={["1"]}
                             defaultOpenKeys={["sub1"]}
                             mode="inline"
                         >
                             <MenuItemGroup key="g1" title="Меню">
-                                <Menu.Item key="1">Навантаження викладача</Menu.Item>
-                                <Menu.Item key="2">Option 2</Menu.Item>
-                                <Menu.Item key="3">Option 3</Menu.Item>
-                                <Menu.Item key="4">Option 4</Menu.Item>
+                                <Menu.Item key="teachersFilter">Викладачі</Menu.Item>
+                                <Menu.Item key="teachersLoad">Навантаження викладачів</Menu.Item>
                             </MenuItemGroup>
                         </Menu>
                     </Sider>
@@ -104,6 +115,7 @@ class App extends Component {
                                 style={{width: "100%", paddingTop: '10px'}}
                                 placeholder="Виберіть аудиторію"
                                 defaultValue={this.state.selectedClassrooms}
+                                disabled={!queriesConfig[this.state.key].requiredSelects.includes('classrooms')}
                                 onChange={this.onSelectChange.bind(this, 'selectedClassrooms')}
                             >
                                 {classrooms}
@@ -112,6 +124,7 @@ class App extends Component {
                                 mode="multiple"
                                 style={{width: "49.5%", paddingTop: '10px', marginRight: '0.5%'}}
                                 placeholder="Виберіть предмет"
+                                disabled={!queriesConfig[this.state.key].requiredSelects.includes('subjects')}
                                 defaultValue={this.state.selectedSubjects}
                                 onChange={this.onSelectChange.bind(this, 'selectedSubjects')}
                             >
@@ -121,6 +134,7 @@ class App extends Component {
                                 mode="multiple"
                                 style={{width: "49.5%", paddingTop: '10px', marginLeft: '0.5%'}}
                                 placeholder="Виберіть викладача"
+                                disabled={!queriesConfig[this.state.key].requiredSelects.includes('teachers')}
                                 defaultValue={this.state.selectedTeachers}
                                 onChange={this.onSelectChange.bind(this, 'selectedTeachers')}
                             >
@@ -130,6 +144,7 @@ class App extends Component {
                                 mode="multiple"
                                 style={{width: "33%", paddingTop: '10px'}}
                                 placeholder="Виберіть день"
+                                disabled={!queriesConfig[this.state.key].requiredSelects.includes('days')}
                                 defaultValue={this.state.selectedDays}
                                 onChange={this.onSelectChange.bind(this, 'selectedDays')}
                             >
@@ -139,6 +154,7 @@ class App extends Component {
                                 mode="multiple"
                                 style={{width: "33%", 'marginLeft': "0.5%", 'marginRight': "0.5%", paddingTop: '10px'}}
                                 placeholder="Виберіть годину"
+                                disabled={!queriesConfig[this.state.key].requiredSelects.includes('hours')}
                                 defaultValue={this.state.selectedHours}
                                 onChange={this.onSelectChange.bind(this, 'selectedHours')}
                             >
@@ -148,6 +164,7 @@ class App extends Component {
                                 mode="multiple"
                                 style={{width: "33%", paddingTop: '10px'}}
                                 placeholder="Виберіть тиждень"
+                                disabled={!queriesConfig[this.state.key].requiredSelects.includes('weeks')}
                                 defaultValue={this.state.selectedWeeks}
                                 onChange={this.onSelectChange.bind(this, 'selectedWeeks')}
                             >
@@ -167,7 +184,7 @@ class App extends Component {
                                 className="content__table"
                                 columns={columns}
                                 pagination={{pageSize: 10}}
-                                dataSource={this.props.query.data ? payloadTransform(this.props.query.data) : []}
+                                dataSource={this.props[this.state.key] ? payloadTransform(this.props[this.state.key]) : []}
                             />
                         </div>
                     </Content>
@@ -184,10 +201,12 @@ const mapStateToProps = state => ({
     classrooms: state.classroom.classrooms,
     teachers: state.teacher.teachers,
     subjects: state.subject.subjects,
-    query: state.teacher.query
+
+    teachersLoad: state.teacher.teachersLoad,
+    teachersFilter: state.teacher.teachersFilter
 });
 
-// Передаем экшены, чтобы они были доступны без доп. оберток и связаны со store
+//TODO Передаем экшены, чтобы они были доступны без доп. оберток и связаны со store
 const mapDispatchToProps = dispatch =>
     bindActionCreators(
         {
@@ -196,7 +215,8 @@ const mapDispatchToProps = dispatch =>
             fetchClassrooms,
             fetchTeachers,
             fetchSubjects,
-            fetchTeachersLoad
+            fetchTeachersLoad,
+            fetchFilterTeachersLoad
         },
         dispatch
     );
@@ -208,8 +228,11 @@ App.defaultProps = {
     classrooms: [],
     teachers: [],
     subjects: [],
-    query: {
-        type: '',
-        data: []
-    }
+
+    ...(Object.assign({},
+            ..._.toPairs(queriesConfig)
+                .filter(([fieldName]) => fieldName === 'storageField')
+                .map(([name, storageField]) => ({[storageField]: []}))
+        )
+    )
 };

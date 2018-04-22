@@ -46,5 +46,13 @@ export default {
                 hour: !_.isNumber(value.hour) || hours[value.hour],
                 weeks: !_.isArray(value.weeks) || value.weeks.join(',')
             }));
-    }
+    },
+
+    sendRequest: (props, state) => {
+        props.fetchTeachersLoad(state.selectedTeachers, state.selectedWeeks);
+    },
+
+    requiredSelects: ['teachers', 'weeks'],
+
+    storageField: 'teachersLoad'
 };

@@ -7,14 +7,7 @@ module.exports = {
   path: '/teacher/nearest_subject',
   options: {
     tags: ['api'],
-    auth: {
-      scope: ['admin'],
-      strategy: 'jwt'
-    },
     validate: {
-      options: {
-        allowUnknown: true
-      },
       query: {
         day: Joi.number().required(),
         week: Joi.number().required(),
