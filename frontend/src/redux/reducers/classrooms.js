@@ -8,6 +8,10 @@ export default (state = initialState, action) => {
             return state;
         case types.FETCH_CLASSROOMS_SUCCESS:
             return {...state, classrooms: action.payload};
+        case types.FETCH_TEACHER_CLASSROOMS_REQUEST:
+            return state;
+        case types.FETCH_TEACHER_CLASSROOMS_SUCCESS:
+            return {...state, teacherClassrooms: action.payload};
         default:
             return state;
     }

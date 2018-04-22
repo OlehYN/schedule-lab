@@ -8,9 +8,10 @@ import {bindActionCreators} from "redux";
 import {Upload, message, Icon} from 'antd';
 import {Layout, Menu, Avatar, Select, Table, Button} from "antd";
 
+//TODO: write here
 // redux
 import {increment, decrement} from "./redux/actions/counter";
-import {fetchClassrooms} from "./redux/actions/classrooms";
+import {fetchClassrooms, fetchTeacherClassrooms} from "./redux/actions/classrooms";
 import {fetchTeachers, fetchTeachersLoad, fetchFilterTeachersLoad} from "./redux/actions/teachers";
 import {fetchSubjects} from './redux/actions/subjects';
 
@@ -73,7 +74,6 @@ class App extends Component {
     }
 
     render() {
-
         const uploadConfig = {
             name: 'file',
             action: '//localhost:5000/parse/schedule',
@@ -91,6 +91,7 @@ class App extends Component {
         };
 
         const {payloadTransform, columns} = queriesConfig[this.state.key];
+        console.log(queriesConfig);
 
         const classrooms = this.props.classrooms
             .map(({building, number}) => <Option key={`${building}-${number}`}>{building}-{number}</Option>);
@@ -141,6 +142,7 @@ class App extends Component {
                             <MenuItemGroup key="g1" title="Меню">
                                 <Menu.Item key="teachersFilter">Викладачі</Menu.Item>
                                 <Menu.Item key="teachersLoad">Навантаження викладачів</Menu.Item>
+                                <Menu.Item key="teacherClassrooms">Знайти викладача</Menu.Item>
                             </MenuItemGroup>
                         </Menu>
                     </Sider>
@@ -238,10 +240,12 @@ const mapStateToProps = state => ({
     teachers: state.teacher.teachers,
     subjects: state.subject.subjects,
 
+    teacherClassrooms: state.classroom.teacherClassrooms,
     teachersLoad: state.teacher.teachersLoad,
     teachersFilter: state.teacher.teachersFilter
 });
 
+// TODO: Write here
 //TODO Передаем экшены, чтобы они были доступны без доп. оберток и связаны со store
 const mapDispatchToProps = dispatch =>
     bindActionCreators(
@@ -252,7 +256,9 @@ const mapDispatchToProps = dispatch =>
             fetchTeachers,
             fetchSubjects,
             fetchTeachersLoad,
-            fetchFilterTeachersLoad
+            fetchFilterTeachersLoad,
+            fetchTeacherClassrooms
+
         },
         dispatch
     );

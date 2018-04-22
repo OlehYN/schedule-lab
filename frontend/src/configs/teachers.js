@@ -11,10 +11,6 @@ export default {
         return payload.map((teacherName) => ({teacher: teacherName}));
     },
     
-    requiredFilters: [
-
-    ],
-    
     sendRequest: (props, state) => {
         props.fetchFilterTeachersLoad(state.selectedSubjects, state.selectedTeachers);
     },

@@ -1,5 +1,6 @@
 import types from "../types.js";
 
+// one actions config set
 export function fetchTeachersRequest() {
     return {
         type: types.FETCH_TEACHERS_REQUEST
@@ -27,6 +28,7 @@ export const fetchTeachers = () => (dispatch) => {
         .then(response => response.json())
         .then(json => dispatch(fetchTeachersSuccess(json)));
 };
+//
 
 export function fetchTeachersLoadRequest() {
     return {

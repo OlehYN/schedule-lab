@@ -3,6 +3,100 @@ import _ from 'lodash';
 import days from './../constants/days';
 import hours from './../constants/hours';
 
+/*
+
+ {
+    "room": {
+      "building": "3",
+      "number": "409"
+    },
+    "schedule": [
+      {
+        "day": 3,
+        "hour": 2,
+        "weeks": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ]
+      }
+    ]
+  }
+
+ */
+
+/*
+
+[
+  {
+    "teacher": "cт.викл. В.О. Лебідь",
+    "schedule": [
+      {
+        "day": "0",
+        "subjects": [
+          {
+            "day": 0,
+            "hour": 3,
+            "weeks": [
+              4,
+              9,
+              14
+            ],
+            "classroom": {
+              "building": "10",
+              "number": "4",
+              "equipment": [
+                "projector",
+                "computers"
+              ],
+              "seats_range": {
+                "from": 10,
+                "to": 15
+              }
+            },
+            "subject": "Теорія ймовірностей",
+            "group": [
+              2
+            ]
+          }
+        ]
+      },
+      {
+        "day": "1",
+        "subjects": []
+      },
+      {
+        "day": "2",
+        "subjects": []
+      },
+      {
+        "day": "3",
+        "subjects": []
+      },
+      {
+        "day": "4",
+        "subjects": []
+      },
+      {
+        "day": "5",
+        "subjects": []
+      }
+    ]
+  }
+]
+
+ */
 export default {
     columns: [
         {
