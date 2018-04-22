@@ -5,6 +5,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 
 // antd
+import {Upload, message, Icon} from 'antd';
 import {Layout, Menu, Avatar, Select, Table, Button} from "antd";
 
 // redux
@@ -72,6 +73,23 @@ class App extends Component {
     }
 
     render() {
+
+        const uploadConfig = {
+            name: 'file',
+            action: '//localhost:5000/parse/schedule',
+            showUploadList: false,
+            onChange(info) {
+                if (info.file.status !== 'uploading') {
+                    console.log(info.file, info.fileList);
+                }
+                if (info.file.status === 'done') {
+                    message.success(`${info.file.name} file uploaded successfully`);
+                } else if (info.file.status === 'error') {
+                    message.error(`${info.file.name} file upload failed.`);
+                }
+            },
+        };
+
         const {payloadTransform, columns} = queriesConfig[this.state.key];
 
         const classrooms = this.props.classrooms
@@ -87,11 +105,29 @@ class App extends Component {
         const hoursOptions = _.entries(hours).map(([key, value]) => <Option key={key}>{value}</Option>);
         const weeksOptions = weeks.map((value) => <Option key={value}>{value}</Option>);
 
+        const selectedTeachers = this.state.selectedTeachers.join(',');
+        const selectedSubjects = this.state.selectedSubjects.join(',');
+
+        const params = [{value: selectedTeachers, name: 'teacher'}, {value: selectedSubjects, name: 'subject'}]
+            .filter(({value}) => value)
+            .map(({name, value}) => `${name}=${value}`)
+            .join('&');
         return (
             <Layout className="layout">
                 <Header className="header">
                     <Avatar size="large" icon="calendar"/>
                     <div className="header__title">EPIC SCHEDULER</div>
+                    <div style={{marginLeft: 'auto', marginRight: 0}}>
+                        <Upload {...uploadConfig}>
+                            <Button>
+                                <Icon type="upload"/> Додати розклад
+                            </Button>
+                        </Upload>
+                        <a href={`http://localhost:9100/reports/classrooms/load?${params}`}>
+                            <Button href={`http://localhost:9100/reports/classrooms/load?${params}`}
+                                    style={{marginLeft: 10}} type="primary" icon="download">Excel</Button>
+                        </a>
+                    </div>
                 </Header>
                 <Layout>
                     <Sider className="sider" width={{widht: 256}}>
