@@ -3,6 +3,7 @@
 }
 
 .ant-layout-has-sider > div.sider {
+    min-width: 256px;
     width: 256px;
 }
 
@@ -34,13 +35,14 @@
 }
 
 .content__table {
-    margin: 10px 0;
+    margin: 5px 0;
 }
 
 
 .footer {
     background: #404040;
     color: #ECECEC;
+    padding: 12px 50px;
 }
 
 

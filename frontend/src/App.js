@@ -6,7 +6,7 @@ import {bindActionCreators} from "redux";
 
 // antd
 import {Upload, message, Icon} from 'antd';
-import {Layout, Menu, Avatar, Select, Table, Button} from "antd";
+import {Layout, Menu, Avatar, Select, Table, Button, Card} from "antd";
 
 //TODO: write here
 // redux
@@ -41,6 +41,7 @@ class App extends Component {
             selectedDays: [],
             selectedWeeks: [],
             selectedHours: [],
+            tabKey: 'tab1',
 
             key: 'teachersLoad',
 
@@ -73,6 +74,11 @@ class App extends Component {
         this.setState({key, query: {type: null, data: []}});
     }
 
+    onTabChange = (key, type) => {
+        console.log(key, type);
+        this.setState({[type]: key});
+    };
+
     render() {
         const uploadConfig = {
             name: 'file',
@@ -90,8 +96,7 @@ class App extends Component {
             },
         };
 
-        const {payloadTransform, columns} = queriesConfig[this.state.key];
-        console.log(queriesConfig);
+        const {payloadTransform, columns, type} = queriesConfig[this.state.key];
 
         const classrooms = this.props.classrooms
             .map(({building, number}) => <Option key={`${building}-${number}`}>{building}-{number}</Option>);
@@ -113,6 +118,20 @@ class App extends Component {
             .filter(({value}) => value)
             .map(({name, value}) => `${name}=${value}`)
             .join('&');
+
+        const tabList = type === 'tabs'
+            ? payloadTransform(this.props[this.state.key]).map(({key}) => ({key, tab: key}))
+            : [];
+
+        const tabsType = type === 'tabs' && tabList.length !== 0;
+        const defaultTapSelected = tabsType && this.state.tabKey && tabList.map(({key}) => key).includes(this.state.tabKey)
+            ? this.state.tabKey
+            : (tabList[0] || {}).key;
+
+        const schedule = tabsType
+            ? (payloadTransform(this.props[this.state.key]).filter(({key}) => key === defaultTapSelected)[0] || {}).schedule || []
+            : payloadTransform(this.props[this.state.key]);
+
         return (
             <Layout className="layout">
                 <Header className="header">
@@ -124,25 +143,22 @@ class App extends Component {
                                 <Icon type="upload"/> Додати розклад
                             </Button>
                         </Upload>
-                        <a href={`http://localhost:9100/reports/classrooms/load?${params}`}>
                             <Button href={`http://localhost:9100/reports/classrooms/load?${params}`}
                                     style={{marginLeft: 10}} type="primary" icon="download">Excel</Button>
-                        </a>
                     </div>
                 </Header>
                 <Layout>
-                    <Sider className="sider" width={{widht: 256}}>
+                    <Sider className="sider" width={{width: 256}}>
                         <Menu
                             onClick={this.menuItemChange.bind(this)}
                             style={{width: 256}}
-                            defaultSelectedKeys={["1"]}
-                            defaultOpenKeys={["sub1"]}
+                            defaultSelectedKeys={[this.state.key]}
                             mode="inline"
                         >
                             <MenuItemGroup key="g1" title="Меню">
-                                <Menu.Item key="teachersFilter">Викладачі</Menu.Item>
                                 <Menu.Item key="teachersLoad">Навантаження викладачів</Menu.Item>
-                                <Menu.Item key="teacherClassrooms">Знайти викладача</Menu.Item>
+                                <Menu.Item key="teachersFilter">Викладачі</Menu.Item>
+                                <Menu.Item key="teacherClassrooms">Аудиторії викладачів</Menu.Item>
                             </MenuItemGroup>
                         </Menu>
                     </Sider>
@@ -218,12 +234,28 @@ class App extends Component {
                                 </Button>
                             </div>
 
-                            <Table
-                                className="content__table"
-                                columns={columns}
-                                pagination={{pageSize: 10}}
-                                dataSource={this.props[this.state.key] ? payloadTransform(this.props[this.state.key]) : []}
-                            />
+                            {tabsType ?
+                                (<Card
+                                    tabList={tabList}
+                                    style={{marginTop: 10}}
+                                    onTabChange={(key) => {
+                                        this.onTabChange(key, 'tabKey');
+                                    }}
+                                >
+                                    <Table
+                                        className="content__table"
+                                        columns={columns}
+                                        pagination={{pageSize: 7}}
+                                        dataSource={schedule}
+                                    />
+                                </Card>)
+                                :
+                                <Table
+                                    className="content__table"
+                                    columns={columns}
+                                    pagination={{pageSize: 9}}
+                                    dataSource={this.props[this.state.key] ? payloadTransform(this.props[this.state.key]) : []}
+                                />}
                         </div>
                     </Content>
                 </Layout>

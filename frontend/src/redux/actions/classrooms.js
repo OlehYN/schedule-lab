@@ -51,8 +51,17 @@ export function fetchTeacherClassroomsError(error) {
     };
 }
 
-export const fetchTeacherClassrooms = (teacher) => (dispatch) => {
-    return fetch("http://localhost:9100/classroom/teacher?name="+teacher, {method: "GET"})
+export const fetchTeacherClassrooms = (selectedTeachers) => (dispatch) => {
+    const teachers = selectedTeachers.join(',');
+
+    const params = [{value: teachers, name: 'teacher'}]
+        .filter(({value}) => value)
+        .map(({name, value}) => `${name}=${value}`)
+        .join('&');
+
+    const queryString = params ? '?' + params : '';
+
+    return fetch("http://localhost:9100/classroom/teacher"+queryString, {method: "GET"})
         .then(response => response.json())
         .then(json => dispatch(fetchTeacherClassroomsSuccess(json)));
 };

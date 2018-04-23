@@ -126,20 +126,26 @@ export default {
         }
     ],
 
-    payloadTransform: (payload) => {
+    payloadTransform: (payload = []) => {
         const mappedPayload = payload.map(({teacher, schedule}) =>
             schedule
                 .filter(({subjects}) => subjects.length)
                 .map(({day, subjects}) => subjects.map((subject) => ({day, teacher, ...subject})))
         );
 
-        return _.flatten(_.flatten(mappedPayload))
+        const data = _.flatten(_.flatten(mappedPayload))
             .map((value, index) => ({...value, key: index}))
+            .sort(({day: dayA}, {day: dayB}) => dayA - dayB)
             .map((value) => Object.assign(value, {
                 day: !_.isNumber(value.day) || days[value.day],
                 hour: !_.isNumber(value.hour) || hours[value.hour],
                 weeks: !_.isArray(value.weeks) || value.weeks.join(',')
             }));
+
+        const transformedData = _.uniq(data.map(({day}) => day))
+            .map((groupDay) => ({key: groupDay, schedule: data.filter(({day}) => day === groupDay)}));
+
+        return transformedData;
     },
 
     sendRequest: (props, state) => {
@@ -148,5 +154,6 @@ export default {
 
     requiredSelects: ['teachers', 'weeks'],
 
-    storageField: 'teachersLoad'
+    storageField: 'teachersLoad',
+    type: 'tabs'
 };

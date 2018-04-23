@@ -1,20 +1,9 @@
 import _ from 'lodash';
 
-import days from './../constants/days';
-import hours from './../constants/hours';
+import humanReadable from './../utils/human_readable';
 
 export default {
     columns: [
-        {
-            title: "Корпус",
-            dataIndex: "building",
-            key: "building"
-        },
-        {
-            title: "Аудиторія",
-            dataIndex: "number",
-            key: "number"
-        },
         {
             title: "День",
             dataIndex: "day",
@@ -29,24 +18,34 @@ export default {
             title: "Тижні",
             dataIndex: "weeks",
             key: "weeks"
+        },
+        {
+            title: "Викладач",
+            dataIndex: "teacher",
+            key: "teacher"
+        },
+        {
+            title: "Предмет",
+            dataIndex: "subject",
+            key: "subject"
         }
     ],
 
-    payloadTransform: (payload) => {
-        /*const mappedPayload = payload.map(({room, schedule}) =>
-            ({
-                room: room.building, number: room.number, day: schedule.day,
-                hour: schedule.hour, weeks: schedule.weeks.join(',')
-            }));*/
-        return [];
+    payloadTransform: (payload = []) => {
+        const pureData = payload.filter(({room}) => room)
+            .map(({room: {building, number}, schedule}) => ({key: `${building}-${number}`, schedule}));
 
+        const keys = _.uniq(pureData.map(({key}) => key)).sort((a, b) => a.localeCompare(b));
+        const data = keys.map((dataKey) => ({key: dataKey, schedule: _.flatten(pureData.filter(({key}) => key === dataKey).map(({schedule}) => schedule))}));
+
+        return humanReadable(data);
     },
 
     sendRequest: (props, state) => {
-        props.fetchTeacherClassrooms(state.selectedTeachers[0]);
+        props.fetchTeacherClassrooms(state.selectedTeachers);
     },
 
     requiredSelects: ['teachers'],
-
+    type: 'tabs',
     storageField: 'teacherClassrooms'
 };
