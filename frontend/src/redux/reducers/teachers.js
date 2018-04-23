@@ -16,6 +16,10 @@ export default (state = initialState, action) => {
             return state;
         case types.FETCH_FILTER_TEACHERS_SUCCESS:
             return {...state, teachersFilter: action.payload};
+        case types.FETCH_TEACHER_GROUPS_REQUEST:
+            return state;
+        case types.FETCH_TEACHER_GROUPS_SUCCESS:
+            return {...state, teacherGroups: action.payload};
         default:
             return state;
     }

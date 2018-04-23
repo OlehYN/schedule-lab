@@ -102,3 +102,40 @@ export const fetchFilterTeachersLoad = (selectedSubjects, selectedTeachers) => (
         .then(response => response.json())
         .then(json => dispatch(fetchFilterTeachersLoadSuccess(json)));
 };
+
+export function fetchTeacherGroupsRequest() {
+    return {
+        type: types.FETCH_TEACHER_GROUPS_REQUEST
+    };
+}
+
+export function fetchTeacherGroupsSuccess(payload) {
+    return {
+        type: types.FETCH_TEACHER_GROUPS_SUCCESS,
+        payload
+    };
+}
+
+// сейчас не используется (пример стуктуры)
+export function fetchTeacherGroupsError(error) {
+    return {
+        type: types.FETCH_TEACHER_GROUPS_FAIL,
+        payload: error,
+        error: true
+    };
+}
+
+export const fetchTeacherGroups = (selectedTeachers) => (dispatch) => {
+    const teachers = selectedTeachers.join(',');
+
+    const params = [{value: teachers, name: 'teacher'}]
+        .filter(({value}) => value)
+        .map(({name, value}) => `${name}=${value}`)
+        .join('&');
+
+    const queryString = params ? '?' + params : '';
+
+    return fetch("http://localhost:9100/teacher/group"+queryString, {method: "GET"})
+        .then(response => response.json())
+        .then(json => dispatch(fetchTeacherGroupsSuccess(json)));
+};
