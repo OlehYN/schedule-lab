@@ -22,7 +22,7 @@ export default (payload) => {
                 clonedDoc.hour = hours[clonedDoc.hour];
             }
 
-            if (clonedDoc.weeks) {
+            if (clonedDoc.weeks && _.isArray(clonedDoc.weeks)) {
                 clonedDoc.weeks = clonedDoc.weeks.join(',');
             }
 

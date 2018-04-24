@@ -12,7 +12,7 @@ module.exports = {
         day: Joi.number().required(),
         week: Joi.number().required(),
         hour: Joi.number().required(),
-        teacher: Joi.string().required()
+        teacher: Joi.string().empty('').optional()
       }
     }
   },
@@ -21,10 +21,11 @@ module.exports = {
     const scheduleModel = db.model('schedule');
 
     const {day, week, hour, teacher} = request.query;
+    const teachers = teacher ? teacher.split(',') : null;
 
     return await scheduleModel.aggregate([
       {$unwind: '$weeks'},
-      {$match: {teacher: {$regex: `.*${teacher}.*`}}},
+      ...(teacher ? [{$match: {teacher: {$in: teachers}}}] : []),
       {
         $match:
           {
@@ -38,12 +39,12 @@ module.exports = {
       },
       {
         $project: {
-          subject: 1, classroom: 1, weeks: 1, weekday: 1, time: 1, teacher: 1,
+          subject: 1, classroom: 1, weeks: 1, day: '$weekday', hour: '$time', teacher: 1,
           coefficient: {
             $add: [
-              {$abs: {$multiply: [1000, {$subtract: ['$weeks', week]}]}},
-              {$abs: {$multiply: [100, {$subtract: ['$weekday', day]}]}},
-              {$abs: {$multiply: [10, {$subtract: ['$time', hour]}]}}
+              {$multiply: [1000, {$subtract: ['$weeks', week]}]},
+              {$multiply: [100, {$subtract: ['$weekday', day]}]},
+              {$multiply: [10, {$subtract: ['$time', hour]}]}
             ]
           }
         }

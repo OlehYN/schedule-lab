@@ -12,6 +12,10 @@ export default (state = initialState, action) => {
             return state;
         case types.FETCH_FILTER_SUBJECTS_SUCCESS:
             return {...state, subjectsFilter: action.payload};
+        case types.FETCH_NEAREST_SUBJECTS_REQUEST:
+            return state;
+        case types.FETCH_NEAREST_SUBJECTS_SUCCESS:
+            return {...state, nearestSubjects: action.payload};
         default:
             return state;
     }

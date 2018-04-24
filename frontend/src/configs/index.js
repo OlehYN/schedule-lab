@@ -4,6 +4,7 @@ import teacherClassrooms from './teacher_classrooms';
 import teacherGroups from './teacher_groups';
 import subjectsFilter from './subjects';
 import emptyClassrooms from './empty_classrooms';
+import nearestSubjects from './nearest_subjects';
 
 export default {
     teachersLoad,
@@ -11,5 +12,6 @@ export default {
     teacherClassrooms,
     teacherGroups,
     subjectsFilter,
-    emptyClassrooms
+    emptyClassrooms,
+    nearestSubjects
 }

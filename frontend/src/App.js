@@ -13,7 +13,7 @@ import {Layout, Menu, Avatar, Select, Table, Button, Card} from "antd";
 import {increment, decrement} from "./redux/actions/counter";
 import {fetchClassrooms, fetchTeacherClassrooms, fetchEmptyClassrooms} from "./redux/actions/classrooms";
 import {fetchTeachers, fetchTeachersLoad, fetchFilterTeachers, fetchTeacherGroups} from "./redux/actions/teachers";
-import {fetchSubjects, fetchFilterSubjects} from './redux/actions/subjects';
+import {fetchSubjects, fetchFilterSubjects, fetchNearestSubjects} from './redux/actions/subjects';
 
 import days from './constants/days';
 import hours from './constants/hours';
@@ -161,7 +161,8 @@ class App extends Component {
                                 <Menu.Item key="teachersFilter">Викладачі</Menu.Item>
                                 <Menu.Item key="emptyClassrooms">Аудиторії</Menu.Item>
                                 <Menu.Item key="teacherGroups">Групи викладачів</Menu.Item>
-                                <Menu.Item key="subjectsFilter">Пошук предметів</Menu.Item>
+                                <Menu.Item key="nearestSubjects">Найближчі заняття</Menu.Item>
+                                <Menu.Item key="subjectsFilter">Пошук занять</Menu.Item>
                             </MenuItemGroup>
                         </Menu>
                     </Sider>
@@ -280,7 +281,8 @@ const mapStateToProps = state => ({
     teachersFilter: state.teacher.teachersFilter,
     teacherGroups: state.teacher.teacherGroups,
     subjectsFilter: state.subject.subjectsFilter,
-    emptyClassrooms: state.classroom.emptyClassrooms
+    emptyClassrooms: state.classroom.emptyClassrooms,
+    nearestSubjects: state.subject.nearestSubjects
 });
 
 // TODO: Write here
@@ -298,7 +300,8 @@ const mapDispatchToProps = dispatch =>
             fetchTeacherClassrooms,
             fetchTeacherGroups,
             fetchFilterSubjects,
-            fetchEmptyClassrooms
+            fetchEmptyClassrooms,
+            fetchNearestSubjects
 
         },
         dispatch
