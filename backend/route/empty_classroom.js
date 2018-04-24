@@ -9,9 +9,9 @@ module.exports = {
     tags: ['api'],
     validate: {
       query: {
-        day: Joi.number().required(),
-        week: Joi.number().required(),
-        hour: Joi.number().required(),
+        day: Joi.string().empty('').optional(),
+        week: Joi.string().empty('').optional(),
+        hour: Joi.string().empty('').optional(),
         tags: Joi.string().default('').optional()
       }
     }
@@ -20,15 +20,23 @@ module.exports = {
     const {server: {app: {db}}} = request;
     const scheduleModel = db.model('schedule');
 
-    const {day, week, hour, tags} = request.query;
+    const {tags} = request.query;
     const allTags = tags.split(',').filter(Boolean);
 
-    const availableAuditoriums = (await scheduleModel.aggregate([
+    const {day, week, hour} = request.query;
+    const days = (day ? day.split(',') : []).map(Number);
+    const hours = (hour ? hour.split(',') : []).map(Number);
+    const weeks = (week ? week.split(',') : []).map(Number);
+
+    return (await scheduleModel.aggregate([
       {$group: {_id: '$classroom', schedule: {$addToSet: {day: '$weekday', hour: '$time', weeks: '$weeks'}}}},
-      {$match: {schedule: {$not: {$elemMatch: {day, hour, weeks: {$in: [week]}}}}}},
+      ...(day ? [{$match: {schedule: {$not: {$elemMatch: {day: {$in: days}}}}}}] : []),
+      ...(hour ? [{$match: {schedule: {$not: {$elemMatch: {hour: {$in: hours}}}}}}] : []),
+      ...(week ? [{$match: {schedule: {$not: {$elemMatch: {weeks: {$in: weeks}}}}}}] : []),
       ...(allTags.length ? [{$match: {'_id.equipment': {$all: allTags}}}] : []),
-      {$project: {_id: 1}}
-    ])).map(({_id}) => _id);
-    return await availableAuditoriums;
+      {$project: {classroom: '$_id', equipment: '$_id.equipment', _id: 0}},
+      {$sort: {'classroom.building': 1, 'classroom.number': 1}},
+      {$match: {classroom: {$ne: null}}},
+    ]));
   }
 };

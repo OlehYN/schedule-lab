@@ -11,7 +11,7 @@ import {Layout, Menu, Avatar, Select, Table, Button, Card} from "antd";
 //TODO: write here
 // redux
 import {increment, decrement} from "./redux/actions/counter";
-import {fetchClassrooms, fetchTeacherClassrooms} from "./redux/actions/classrooms";
+import {fetchClassrooms, fetchTeacherClassrooms, fetchEmptyClassrooms} from "./redux/actions/classrooms";
 import {fetchTeachers, fetchTeachersLoad, fetchFilterTeachers, fetchTeacherGroups} from "./redux/actions/teachers";
 import {fetchSubjects, fetchFilterSubjects} from './redux/actions/subjects';
 
@@ -157,10 +157,11 @@ class App extends Component {
                         >
                             <MenuItemGroup key="g1" title="Меню">
                                 <Menu.Item key="teachersLoad">Навантаження викладачів</Menu.Item>
+                                <Menu.Item key="teacherClassrooms">Навантаження аудиторій</Menu.Item>
                                 <Menu.Item key="teachersFilter">Викладачі</Menu.Item>
-                                <Menu.Item key="teacherClassrooms">Аудиторії</Menu.Item>
+                                <Menu.Item key="emptyClassrooms">Аудиторії</Menu.Item>
                                 <Menu.Item key="teacherGroups">Групи викладачів</Menu.Item>
-                                <Menu.Item key="subjectsFilter">Пошук по даті</Menu.Item>
+                                <Menu.Item key="subjectsFilter">Пошук предметів</Menu.Item>
                             </MenuItemGroup>
                         </Menu>
                     </Sider>
@@ -278,7 +279,8 @@ const mapStateToProps = state => ({
     teachersLoad: state.teacher.teachersLoad,
     teachersFilter: state.teacher.teachersFilter,
     teacherGroups: state.teacher.teacherGroups,
-    subjectsFilter: state.subject.subjectsFilter
+    subjectsFilter: state.subject.subjectsFilter,
+    emptyClassrooms: state.classroom.emptyClassrooms
 });
 
 // TODO: Write here
@@ -295,7 +297,8 @@ const mapDispatchToProps = dispatch =>
             fetchFilterTeachers,
             fetchTeacherClassrooms,
             fetchTeacherGroups,
-            fetchFilterSubjects
+            fetchFilterSubjects,
+            fetchEmptyClassrooms
 
         },
         dispatch

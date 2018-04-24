@@ -2,6 +2,7 @@ import _ from 'lodash';
 
 import days from './../constants/days';
 import hours from './../constants/hours';
+import equipment from './../constants/equipment';
 
 export default (payload) => {
     if ((payload[0] || {}).schedule) {
@@ -23,6 +24,10 @@ export default (payload) => {
 
             if (clonedDoc.weeks) {
                 clonedDoc.weeks = clonedDoc.weeks.join(',');
+            }
+
+            if (clonedDoc.equipment) {
+                clonedDoc.equipment = clonedDoc.equipment.map((id) => equipment[id]).join('; ');
             }
 
             return clonedDoc;

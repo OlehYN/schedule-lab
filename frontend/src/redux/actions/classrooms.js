@@ -65,3 +65,41 @@ export const fetchTeacherClassrooms = (selectedTeachers) => (dispatch) => {
         .then(response => response.json())
         .then(json => dispatch(fetchTeacherClassroomsSuccess(json)));
 };
+
+export function fetchEmptyClassroomsRequest() {
+    return {
+        type: types.FETCH_EMPTY_CLASSROOMS_REQUEST
+    };
+}
+
+export function fetchEmptyClassroomsSuccess(payload) {
+    return {
+        type: types.FETCH_EMPTY_CLASSROOMS_SUCCESS,
+        payload
+    };
+}
+
+// сейчас не используется (пример стуктуры)
+export function fetchEmptyClassroomsError(error) {
+    return {
+        type: types.FETCH_EMPTY_CLASSROOMS_FAIL,
+        payload: error,
+        error: true
+    };
+}
+
+export const fetchEmptyClassrooms = (selectedDays, selectedHours, selectedWeeks) => (dispatch) => {
+    const day = selectedDays.join(',');
+    const week = selectedWeeks.join(',');
+    const hour = selectedHours.join(',');
+
+    const params = [{value: day, name: 'day'}, {value: week, name: 'week'}, {value: hour, name: 'hour'}]
+        .filter(({value}) => value)
+        .map(({name, value}) => `${name}=${value}`)
+        .join('&');
+
+    const queryString = params ? '?' + params : '';
+    return fetch("http://localhost:9100/classroom/empty" + queryString, {method: "GET"})
+        .then(response => response.json())
+        .then(json => dispatch(fetchEmptyClassroomsSuccess(json)));
+};

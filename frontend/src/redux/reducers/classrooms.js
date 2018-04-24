@@ -12,6 +12,10 @@ export default (state = initialState, action) => {
             return state;
         case types.FETCH_TEACHER_CLASSROOMS_SUCCESS:
             return {...state, teacherClassrooms: action.payload};
+        case types.FETCH_EMPTY_CLASSROOMS_REQUEST:
+            return state;
+        case types.FETCH_EMPTY_CLASSROOMS_SUCCESS:
+            return {...state, emptyClassrooms: action.payload};
         default:
             return state;
     }
