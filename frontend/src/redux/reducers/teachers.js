@@ -20,6 +20,10 @@ export default (state = initialState, action) => {
             return state;
         case types.FETCH_TEACHER_GROUPS_SUCCESS:
             return {...state, teacherGroups: action.payload};
+        case types.FETCH_TEACHER_DUPLICATES_REQUEST:
+            return state;
+        case types.FETCH_TEACHER_DUPLICATES_SUCCESS:
+            return {...state, teacherDuplicates: action.payload};
         default:
             return state;
     }

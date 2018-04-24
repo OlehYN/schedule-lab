@@ -103,3 +103,31 @@ export const fetchEmptyClassrooms = (selectedDays, selectedHours, selectedWeeks)
         .then(response => response.json())
         .then(json => dispatch(fetchEmptyClassroomsSuccess(json)));
 };
+
+export function fetchClassroomDuplicatesRequest() {
+    return {
+        type: types.FETCH_CLASSROOM_DUPLICATES_REQUEST
+    };
+}
+
+export function fetchClassroomDuplicatesSuccess(payload) {
+    return {
+        type: types.FETCH_CLASSROOM_DUPLICATES_SUCCESS,
+        payload
+    };
+}
+
+// сейчас не используется (пример стуктуры)
+export function fetchClassroomDuplicatesError(error) {
+    return {
+        type: types.FETCH_CLASSROOM_DUPLICATES_FAIL,
+        payload: error,
+        error: true
+    };
+}
+
+export const fetchClassroomDuplicates = () => (dispatch) => {
+    return fetch("http://localhost:9100/reports/duplicates/classroom", {method: "GET"})
+        .then(response => response.json())
+        .then(json => dispatch(fetchClassroomDuplicatesSuccess(json)));
+};

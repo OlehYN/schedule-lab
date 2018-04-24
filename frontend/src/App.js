@@ -11,8 +11,8 @@ import {Layout, Menu, Avatar, Select, Table, Button, Card} from "antd";
 //TODO: write here
 // redux
 import {increment, decrement} from "./redux/actions/counter";
-import {fetchClassrooms, fetchTeacherClassrooms, fetchEmptyClassrooms} from "./redux/actions/classrooms";
-import {fetchTeachers, fetchTeachersLoad, fetchFilterTeachers, fetchTeacherGroups} from "./redux/actions/teachers";
+import {fetchClassrooms, fetchTeacherClassrooms, fetchEmptyClassrooms, fetchClassroomDuplicates} from "./redux/actions/classrooms";
+import {fetchTeachers, fetchTeachersLoad, fetchFilterTeachers, fetchTeacherGroups, fetchTeacherDuplicates} from "./redux/actions/teachers";
 import {fetchSubjects, fetchFilterSubjects, fetchNearestSubjects} from './redux/actions/subjects';
 
 import days from './constants/days';
@@ -163,6 +163,8 @@ class App extends Component {
                                 <Menu.Item key="teacherGroups">Групи викладачів</Menu.Item>
                                 <Menu.Item key="nearestSubjects">Найближчі заняття</Menu.Item>
                                 <Menu.Item key="subjectsFilter">Пошук занять</Menu.Item>
+                                <Menu.Item key="teacherDuplicates">Конфлікт (викладачі)</Menu.Item>
+                                <Menu.Item key="classroomDuplicates">Конфлікт (аудиторії)</Menu.Item>
                             </MenuItemGroup>
                         </Menu>
                     </Sider>
@@ -282,7 +284,9 @@ const mapStateToProps = state => ({
     teacherGroups: state.teacher.teacherGroups,
     subjectsFilter: state.subject.subjectsFilter,
     emptyClassrooms: state.classroom.emptyClassrooms,
-    nearestSubjects: state.subject.nearestSubjects
+    nearestSubjects: state.subject.nearestSubjects,
+    teacherDuplicates: state.teacher.teacherDuplicates,
+    classroomDuplicates: state.classroom.classroomDuplicates
 });
 
 // TODO: Write here
@@ -301,7 +305,9 @@ const mapDispatchToProps = dispatch =>
             fetchTeacherGroups,
             fetchFilterSubjects,
             fetchEmptyClassrooms,
-            fetchNearestSubjects
+            fetchNearestSubjects,
+            fetchTeacherDuplicates,
+            fetchClassroomDuplicates
 
         },
         dispatch

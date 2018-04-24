@@ -139,3 +139,31 @@ export const fetchTeacherGroups = (selectedTeachers) => (dispatch) => {
         .then(response => response.json())
         .then(json => dispatch(fetchTeacherGroupsSuccess(json)));
 };
+
+export function fetchTeacherDuplicatesRequest() {
+    return {
+        type: types.FETCH_TEACHER_DUPLICATES_REQUEST
+    };
+}
+
+export function fetchTeacherDuplicatesSuccess(payload) {
+    return {
+        type: types.FETCH_TEACHER_DUPLICATES_SUCCESS,
+        payload
+    };
+}
+
+// сейчас не используется (пример стуктуры)
+export function fetchTeacherDuplicatesError(error) {
+    return {
+        type: types.FETCH_TEACHER_DUPLICATES_FAIL,
+        payload: error,
+        error: true
+    };
+}
+
+export const fetchTeacherDuplicates = () => (dispatch) => {
+    return fetch("http://localhost:9100/reports/duplicates/teacher", {method: "GET"})
+        .then(response => response.json())
+        .then(json => dispatch(fetchTeacherDuplicatesSuccess(json)));
+};
