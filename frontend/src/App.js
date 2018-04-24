@@ -114,7 +114,7 @@ class App extends Component {
         const selectedTeachers = this.state.selectedTeachers.join(',');
         const selectedSubjects = this.state.selectedSubjects.join(',');
 
-        const params = [{value: selectedTeachers, name: 'teacher'}, {value: selectedSubjects, name: 'subject'}]
+        const params = [{value: selectedTeachers, name: 'teachers'}, {value: selectedSubjects, name: 'subjects'}]
             .filter(({value}) => value)
             .map(({name, value}) => `${name}=${value}`)
             .join('&');
