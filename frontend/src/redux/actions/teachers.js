@@ -72,7 +72,7 @@ export function fetchFilterTeachersRequest() {
     };
 }
 
-export function fetchFilterTeachersLoadSuccess(payload) {
+export function fetchFilterTeachersSuccess(payload) {
     return {
         type: types.FETCH_FILTER_TEACHERS_SUCCESS,
         payload
@@ -80,7 +80,7 @@ export function fetchFilterTeachersLoadSuccess(payload) {
 }
 
 // сейчас не используется (пример стуктуры)
-export function fetchFilterTeachersLoadError(error) {
+export function fetchFilterTeachersError(error) {
     return {
         type: types.FETCH_FILTER_TEACHERS_FAIL,
         payload: error,
@@ -88,7 +88,7 @@ export function fetchFilterTeachersLoadError(error) {
     };
 }
 
-export const fetchFilterTeachersLoad = (selectedSubjects, selectedTeachers) => (dispatch) => {
+export const fetchFilterTeachers = (selectedSubjects, selectedTeachers) => (dispatch) => {
     const teachers = selectedTeachers.join(',');
     const subjects = selectedSubjects.join(',');
 
@@ -100,7 +100,7 @@ export const fetchFilterTeachersLoad = (selectedSubjects, selectedTeachers) => (
     const queryString = params ? '?' + params : '';
     return fetch("http://localhost:9100/teachers" + queryString, {method: "GET"})
         .then(response => response.json())
-        .then(json => dispatch(fetchFilterTeachersLoadSuccess(json)));
+        .then(json => dispatch(fetchFilterTeachersSuccess(json)));
 };
 
 export function fetchTeacherGroupsRequest() {

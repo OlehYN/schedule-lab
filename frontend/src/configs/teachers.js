@@ -11,7 +11,7 @@ export default {
     },
 
     sendRequest: (props, state) => {
-        props.fetchFilterTeachersLoad(state.selectedSubjects, state.selectedTeachers);
+        props.fetchFilterTeachers(state.selectedSubjects, state.selectedTeachers);
     },
     requiredSelects: ['teachers', 'subjects'],
     storageField: 'teachersFilter',
