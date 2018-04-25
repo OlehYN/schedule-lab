@@ -28,11 +28,22 @@ module.exports = {
     const hours = (hour ? hour.split(',') : []).map(Number);
     const weeks = (week ? week.split(',') : []).map(Number);
 
+    const filter = {};
+    if (day) {
+      filter.day = {$in: days};
+    }
+
+    if (hour) {
+      filter.hour = {$in: hours};
+    }
+
+    if (week) {
+      filter.weeks = {$in: weeks};
+    }
+
     return (await scheduleModel.aggregate([
       {$group: {_id: '$classroom', schedule: {$addToSet: {day: '$weekday', hour: '$time', weeks: '$weeks'}}}},
-      ...(day ? [{$match: {schedule: {$not: {$elemMatch: {day: {$in: days}}}}}}] : []),
-      ...(hour ? [{$match: {schedule: {$not: {$elemMatch: {hour: {$in: hours}}}}}}] : []),
-      ...(week ? [{$match: {schedule: {$not: {$elemMatch: {weeks: {$in: weeks}}}}}}] : []),
+      ...(day || hour || week ? [{$match: {schedule: {$not: {$elemMatch: filter}}}}] : []),
       ...(allTags.length ? [{$match: {'_id.equipment': {$all: allTags}}}] : []),
       {$project: {classroom: '$_id', equipment: '$_id.equipment', _id: 0}},
       {$sort: {'classroom.building': 1, 'classroom.number': 1}},

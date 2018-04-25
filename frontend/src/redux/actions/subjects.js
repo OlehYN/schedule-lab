@@ -92,7 +92,7 @@ export function fetchNearestSubjectsError(error) {
 
 export const fetchNearestSubjects = (selectedDays, selectedHours, selectedWeeks, selectedTeachers) => (dispatch) => {
     const day = selectedDays[0] || 0;
-    const week = selectedWeeks[0] || 0;
+    const week = selectedWeeks[0] || 1;
     const hour = selectedHours[0] || 0;
     const teacher = selectedTeachers.join(',') || null;
 
