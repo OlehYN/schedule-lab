@@ -123,6 +123,11 @@ export default {
             title: "Тижні",
             dataIndex: "weeks",
             key: "weeks"
+        },
+        {
+            title: "Група",
+            dataIndex: "group",
+            key: "group"
         }
     ],
 
