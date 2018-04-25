@@ -52,10 +52,12 @@ export function fetchTeachersLoadError(error) {
     };
 }
 
-export const fetchTeachersLoad = (selectedTeachers, selectedWeeks) => (dispatch) => {
+export const fetchTeachersLoad = (selectedTeachers, selectedWeeks, selectedSubjects) => (dispatch) => {
     const name = selectedTeachers.join(',');
     const week = selectedWeeks.join(',');
-    const params = [{value: name, name: 'name'}, {value: week, name: 'week'}]
+    const subject = selectedSubjects.join(',');
+
+    const params = [{value: name, name: 'name'}, {value: week, name: 'week'}, {value: subject, name: 'subject'}]
         .filter(({value}) => value)
         .map(({name, value}) => `${name}=${value}`)
         .join('&');

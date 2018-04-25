@@ -13,20 +13,23 @@ module.exports = {
     validate: {
       query: {
         name: Joi.string().empty('').optional(),
-        week: Joi.number().empty('').optional()
+        week: Joi.number().empty('').optional(),
+        subject: Joi.string().empty('').optional()
       }
     }
   },
   // TODO add extra filtering
   handler: async (request) => {
     const {server: {app: {db}}} = request;
-    const {name, week} = request.query;
+    const {name, week, subject} = request.query;
 
     const scheduleModel = db.model('schedule');
 
     const teachers = name ? name.split(',') : [];
+    const subjects = subject ? subject.split(',') : [];
     const availableAuditoriums = (await scheduleModel.aggregate([
       ...(name ? [{$match: {teacher: {$in: teachers}}}] : []),
+      ...(subject ? [{$match: {subject: {$in: subjects}}}] : []),
       ...(week ? [{$match: {weeks: {$in: [week]}}}] : []),
       {
         $group: {

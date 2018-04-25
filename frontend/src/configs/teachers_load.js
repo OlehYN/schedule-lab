@@ -154,10 +154,10 @@ export default {
     },
 
     sendRequest: (props, state) => {
-        props.fetchTeachersLoad(state.selectedTeachers, state.selectedWeeks);
+        props.fetchTeachersLoad(state.selectedTeachers, state.selectedWeeks, state.selectedSubjects);
     },
 
-    requiredSelects: ['teachers', 'weeks'],
+    requiredSelects: ['teachers', 'weeks', 'subjects'],
 
     storageField: 'teachersLoad',
     type: 'tabs'
