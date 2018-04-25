@@ -132,6 +132,7 @@ export default {
     ],
 
     payloadTransform: (payload = []) => {
+        console.log(payload);
         const mappedPayload = payload.map(({teacher, schedule}) =>
             schedule
                 .filter(({subjects}) => subjects.length)

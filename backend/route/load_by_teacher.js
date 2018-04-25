@@ -13,7 +13,7 @@ module.exports = {
     validate: {
       query: {
         name: Joi.string().empty('').optional(),
-        week: Joi.number().empty('').optional(),
+        week: Joi.string().empty('').optional(),
         subject: Joi.string().empty('').optional()
       }
     }
@@ -27,10 +27,12 @@ module.exports = {
 
     const teachers = name ? name.split(',') : [];
     const subjects = subject ? subject.split(',') : [];
+    const weeks = (week ? week.split(',') : []).map(Number);
+
     const availableAuditoriums = (await scheduleModel.aggregate([
       ...(name ? [{$match: {teacher: {$in: teachers}}}] : []),
       ...(subject ? [{$match: {subject: {$in: subjects}}}] : []),
-      ...(week ? [{$match: {weeks: {$in: [week]}}}] : []),
+      ...(week ? [{$match: {weeks: {$in: weeks}}}] : []),
       {
         $group: {
           _id: '$teacher',
