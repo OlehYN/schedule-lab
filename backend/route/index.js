@@ -13,5 +13,6 @@ module.exports = [
   require('./nearest_subject'),
   require('./teacher_groups'),
   require('./find_subject'),
-  require('./subjects')
+  require('./subjects'),
+  require('./random_names')
 ];

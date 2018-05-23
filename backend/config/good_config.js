@@ -5,12 +5,14 @@ module.exports = {
     interval: 1000
   },
   reporters: {
-    consoleReporter: [{
-      module: 'good-squeeze',
-      name: 'Squeeze',
-      args: [{log: '*', response: '*'}]
-    }, {
-      module: 'good-console'
-    }, 'stdout']
+    consoleReporter: [
+      {
+        module: 'good-squeeze',
+        name: 'Squeeze',
+        args: [{log: '*', response: '*'}]
+      },
+      {
+        module: 'good-console'
+      }, 'stdout']
   }
 };
